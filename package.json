@@ -5,10 +5,11 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "build": "npm run compile && node index.js",
+    "build": "npm install && node index.js",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "vercel-build": "echo 'Build step completed'"
   },
   "dependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",

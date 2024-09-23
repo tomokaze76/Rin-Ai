@@ -114,7 +114,19 @@ function smsg(conn, m, store) {
 async function startHisoka() {
   const { state, saveCreds } = await useMultiFileAuthState(`./${sessionName ? sessionName : "session"}`);
   const { version, isLatest } = await fetchLatestWaWebVersion().catch(() => fetchLatestBaileysVersion());
-  
+  console.log(`using WA v${version.join(".")}, isLatest: ${isLatest}`);
+  console.log(
+    color(
+      figlet.textSync("Rin AI", {
+        font: "Standard",
+        horizontalLayout: "default",
+        vertivalLayout: "default",
+        whitespaceBreak: false,
+      }),
+      "green"
+    )
+  );
+
   const client = sansekaiConnect({
     logger: pino({ level: "silent" }),
     printQRInTerminal: false,
@@ -135,20 +147,20 @@ async function startHisoka() {
       m = smsg(client, mek, store);
       require("./sansekai")(client, m, chatUpdate, store);
     } catch (err) {
-      // console.log(err);
+      console.log(err);
     }
   });
 
   const unhandledRejections = new Map();
   process.on("unhandledRejection", (reason, promise) => {
     unhandledRejections.set(promise, reason);
-    // console.log("Unhandled Rejection at:", promise, "reason:", reason);
+    console.log("Unhandled Rejection at:", promise, "reason:", reason);
   });
   process.on("rejectionHandled", (promise) => {
     unhandledRejections.delete(promise);
   });
   process.on("Something went wrong", function (err) {
-    // console.log("Caught exception: ", err);
+    console.log("Caught exception: ", err);
   });
 
   client.decodeJid = (jid) => {
@@ -195,44 +207,44 @@ async function startHisoka() {
   client.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update;
     if (qr) {
-      // console.log('QR code received');
+      console.log('QR code received');
       qrcode.generate(qr, { small: true }, (qrcode) => {
-        // console.log('Emitting QR code');
+        console.log('Emitting QR code');
         io.emit('qr', qrcode);
       });
     }
     if (connection === "close") {
       let reason = new Boom(lastDisconnect?.error)?.output.statusCode;
       if (reason === DisconnectReason.badSession) {
-        // console.log(`Bad Session File, Please Delete Session and Scan Again`);
+        console.log(`Bad Session File, Please Delete Session and Scan Again`);
         process.exit();
       } else if (reason === DisconnectReason.connectionClosed) {
-        // console.log("Connection closed, reconnecting....");
+        console.log("Connection closed, reconnecting....");
         startHisoka();
       } else if (reason === DisconnectReason.connectionLost) {
-        // console.log("Connection Lost from Server, reconnecting...");
+        console.log("Connection Lost from Server, reconnecting...");
         startHisoka();
       } else if (reason === DisconnectReason.connectionReplaced) {
-        // console.log("Connection Replaced, Another New Session Opened, Please Restart Bot");
+        console.log("Connection Replaced, Another New Session Opened, Please Restart Bot");
         process.exit();
       } else if (reason === DisconnectReason.loggedOut) {
-        // console.log(`Device Logged Out, Please Delete Folder Session yusril and Scan Again.`);
+        console.log(`Device Logged Out, Please Delete Folder Session yusril and Scan Again.`);
         process.exit();
       } else if (reason === DisconnectReason.restartRequired) {
-        // console.log("Restart Required, Restarting...");
+        console.log("Restart Required, Restarting...");
         startHisoka();
       } else if (reason === DisconnectReason.timedOut) {
-        // console.log("Connection TimedOut, Reconnecting...");
+        console.log("Connection TimedOut, Reconnecting...");
         startHisoka();
       } else {
-        // console.log(`Unknown DisconnectReason: ${reason}|${connection}`);
+        console.log(`Unknown DisconnectReason: ${reason}|${connection}`);
         startHisoka();
       }
     } else if (connection === "open") {
       const botNumber = await client.decodeJid(client.user.id);
-      // console.log(color("Bot success conneted to server", "green"));
-      // console.log(color("Donate for creator https://saweria.co/sansekai", "yellow"));
-      // console.log(color("Type /menu to see menu"));
+      console.log(color("Bot success conneted to server", "green"));
+      console.log(color("Donate for creator https://saweria.co/sansekai", "yellow"));
+      console.log(color("Type /menu to see menu"));
       client.sendMessage(botNumber, { text: `Bot started!\n\njangan lupa support ya bang :)\n${donet}` });
     }
   });
@@ -305,5 +317,5 @@ startHisoka();
 
 const port = 3000;
 server.listen(port, () => {
-  // console.log(`Server running on http://localhost:${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });

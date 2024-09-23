@@ -7,9 +7,6 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "build": "npm install && npm run clean && npm run compile",
-    "clean": "rm -rf dist",
-    "compile": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
 
   },
